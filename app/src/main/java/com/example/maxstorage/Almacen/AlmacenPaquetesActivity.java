@@ -3,9 +3,14 @@ package com.example.maxstorage.Almacen;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.InputType;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.SearchView.SearchAutoComplete;
@@ -25,6 +30,7 @@ public class AlmacenPaquetesActivity extends AppCompatActivity {
     private SearchView      searchView;
     private RecyclerView    rvPaquetes;
     private TextView        areaDetalles;
+    private Button          btnBorrar;
     private AlmacenDAO      dao;
     private List<Almacen>   originalList;
     private List<Almacen>   filteredList;
@@ -46,6 +52,7 @@ public class AlmacenPaquetesActivity extends AppCompatActivity {
         searchView   = findViewById(R.id.searchViewId);
         rvPaquetes   = findViewById(R.id.rvPaquetes);
         areaDetalles = findViewById(R.id.areaDetalles);
+        btnBorrar    = findViewById(R.id.btnBorrarPaquete);
 
         // 1.a) Personaliza el SearchView para usar texto negro
         @SuppressLint("RestrictedApi")
@@ -71,6 +78,42 @@ public class AlmacenPaquetesActivity extends AppCompatActivity {
                 filterById(newText.trim());
                 return true;
             }
+        });
+
+        // 5) Botón para borrar paquete
+        btnBorrar.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Borrar paquete");
+            builder.setMessage("Ingresa ID de paquete a borrar:");
+
+            final EditText input = new EditText(this);
+            input.setInputType(InputType.TYPE_CLASS_NUMBER);
+            builder.setView(input);
+
+            builder.setPositiveButton("Borrar", (dialog, which) -> {
+                String texto = input.getText().toString().trim();
+                if (texto.isEmpty()) {
+                    Toast.makeText(this, "Debes ingresar un ID", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                int id = Integer.parseInt(texto);
+                int filas = dao.delete(id);
+                if (filas > 0) {
+                    Toast.makeText(this, "Paquete eliminado", Toast.LENGTH_SHORT).show();
+                    // Actualiza listas
+                    originalList.clear();
+                    originalList.addAll(dao.getAll());
+                    filteredList.clear();
+                    filteredList.addAll(originalList);
+                    adapter.notifyDataSetChanged();
+                    areaDetalles.setText("");
+                } else {
+                    Toast.makeText(this, "No existe paquete con ID " + id, Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            builder.setNegativeButton("Cancelar", null);
+            builder.show();
         });
     }
 
@@ -103,5 +146,6 @@ public class AlmacenPaquetesActivity extends AppCompatActivity {
         areaDetalles.setText(details);
     }
 }
+
 
 
