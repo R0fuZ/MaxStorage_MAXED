@@ -1,6 +1,5 @@
 package com.example.maxstorage.Almacen;
 
-import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -16,7 +15,6 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.SearchView.SearchAutoComplete;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -51,51 +49,49 @@ public class AlmacenPaquetesActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_almacen_paquetes);
 
+        // Ajuste Edge-to-Edge
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets sys = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(sys.left, sys.top, sys.right, sys.bottom);
             return insets;
         });
 
-        // 1) Referencias
+        // Inicializar vistas
         searchView   = findViewById(R.id.searchViewId);
         rvPaquetes   = findViewById(R.id.rvPaquetes);
         areaDetalles = findViewById(R.id.areaDetalles);
         ivQrDetail   = findViewById(R.id.ivQrDetail);
         btnBorrar    = findViewById(R.id.btnBorrarPaquete);
 
-        // 1.a) Personaliza el SearchView
-        @SuppressLint("RestrictedApi")
-        SearchAutoComplete searchText =
-                searchView.findViewById(androidx.appcompat.R.id.search_src_text);
-        searchText.setTextColor(Color.BLACK);
-        searchText.setHintTextColor(Color.BLACK);
-
-        // 2) DAOs
+        // Instanciar DAOs
         dao      = new AlmacenDAO(this);
         userDao  = new UserDAO(this);
 
-        // 3) Carga y configura lista
+        // Cargar lista inicial
         originalList = dao.getAll();
         filteredList = new ArrayList<>(originalList);
+
+        // Configurar RecyclerView
         adapter = new AlmacenAdapter(filteredList, this::showDetails);
         rvPaquetes.setLayoutManager(new LinearLayoutManager(this));
         rvPaquetes.setAdapter(adapter);
 
-        // 4) Filtro en SearchView
+        // Filtro de búsqueda por ID
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override public boolean onQueryTextSubmit(String query)  { return false; }
-            @Override public boolean onQueryTextChange(String newText) {
+            @Override
+            public boolean onQueryTextSubmit(String query) { return false; }
+            @Override
+            public boolean onQueryTextChange(String newText) {
                 filterById(newText.trim());
                 return true;
             }
         });
 
-        // 5) Borrar paquete
+        // Acción borrar paquete
         btnBorrar.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Borrar paquete")
-                    .setMessage("Ingresa ID de paquete a borrar:");
+            AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                    .setTitle("Borrar paquete")
+                    .setMessage("Ingresa ID del paquete a borrar:");
 
             final EditText input = new EditText(this);
             input.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -119,8 +115,7 @@ public class AlmacenPaquetesActivity extends AppCompatActivity {
                     areaDetalles.setText("");
                     ivQrDetail.setVisibility(View.GONE);
                 } else {
-                    Toast.makeText(this, "No existe paquete con ID " + id,
-                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "No existe paquete con ID " + id, Toast.LENGTH_SHORT).show();
                 }
             });
             builder.setNegativeButton("Cancelar", null).show();
@@ -144,7 +139,6 @@ public class AlmacenPaquetesActivity extends AppCompatActivity {
     }
 
     private void showDetails(Almacen a) {
-        // Obtener nombre del usuario que registró
         User u = userDao.findById(a.getRegisteredBy());
         String ownerName = (u != null) ? u.getOwnerName() : "Desconocido";
 
@@ -157,7 +151,6 @@ public class AlmacenPaquetesActivity extends AppCompatActivity {
                 + "Estado: "         + a.getStatus();
         areaDetalles.setText(details);
 
-        // Generar y mostrar el QR
         Bitmap qrBmp = generateQrBitmap(a.getQrCode(), 200, 200);
         if (qrBmp != null) {
             ivQrDetail.setImageBitmap(qrBmp);
