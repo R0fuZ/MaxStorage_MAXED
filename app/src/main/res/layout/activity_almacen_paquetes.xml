@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".Paquetes.PaquetesActivity_Accion">
+    android:background="@color/white">
 
     <!-- Contenedor principal -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <!-- Título -->
         <TextView
@@ -34,20 +37,16 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:background="@color/Fondo"
-            android:textColor="@color/black"
             android:queryHint="Buscar por ID"
             app:iconifiedByDefault="false" />
 
-        <!-- Lista de paquetes con tamaño fijo y scroll interno -->
+        <!-- Lista de paquetes -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvPaquetes"
             android:layout_width="match_parent"
             android:layout_height="300dp"
             android:layout_marginTop="16dp"
-            android:textColor="@color/black"
-
-            android:background="@color/Fondo"
-             />
+            android:background="@color/Fondo" />
 
         <!-- Etiqueta de detalles -->
         <TextView
@@ -55,43 +54,59 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:background="@color/primatyColor"
+            android:gravity="center"
             android:text="Detalles del paquete"
             android:textColor="@color/white"
-            android:background="@color/primatyColor"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:padding="8dp" />
 
-        <!-- Área de detalles no editable con scroll interno -->
+        <!-- Área de detalles y QR -->
         <ScrollView
             android:id="@+id/scrollDetalles"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:background="@color/Fondo"
-            android:textColor="@color/black"
-
             android:padding="12dp">
 
-            <TextView
-                android:id="@+id/areaDetalles"
+            <!-- Único hijo del ScrollView -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                 />
+                android:orientation="vertical">
 
+                <TextView
+                    android:id="@+id/areaDetalles"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <!-- Imagen del código QR -->
+                <ImageView
+                    android:id="@+id/ivQrDetail"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_gravity="center"
+                    android:scaleType="centerInside"
+                    android:visibility="gone"
+                    android:contentDescription="Código QR" />
+
+            </LinearLayout>
         </ScrollView>
 
+        <!-- Botón Borrar paquete -->
         <Button
             android:id="@+id/btnBorrarPaquete"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:backgroundTint="@color/primatyColor"
             android:text="Borrar paquete"
             android:textAllCaps="false"
-            android:background="@color/primatyColor"
-            android:textColor="@color/white"/>
+            android:textColor="@color/white" />
 
     </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
-
